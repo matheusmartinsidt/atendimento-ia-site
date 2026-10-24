@@ -120,6 +120,11 @@
   .chip::before { content: "→ "; color: var(--terra); }
   .chip:hover { color: var(--terra); }
   .aviso-demo { font-size: 14px; color: var(--tinta-2); margin-top: 22px; }
+  .treino { margin-top: 26px; border: 1.5px solid var(--tinta); border-radius: 6px; background: var(--branco); padding: 14px 18px; }
+  .treino summary { font-family: var(--sans); font-size: 16px; font-weight: 600; }
+  .treino summary::after { font-size: 22px; }
+  .treino-aviso { margin-top: 10px; font-size: 13px; color: var(--terra-2); font-weight: 600; }
+  .treino ul { margin: 10px 0 0; padding-left: 18px; color: var(--tinta-2); font-size: 15px; display: grid; gap: 4px; }
   .chat { background: #e9e1d6; border: 1.5px solid var(--tinta); border-radius: 6px; box-shadow: 10px 10px 0 var(--mata); display: flex; flex-direction: column; height: 560px; overflow: hidden; }
   .chat-topo { background: #22493a; color: #fff; padding: 13px 16px; display: flex; gap: 12px; align-items: center; }
   .chat-topo .av { width: 38px; height: 38px; border-radius: 50%; background: var(--mostarda); color: #1d1a16; display: grid; place-items: center; font-weight: 700; font-size: 14px; }
@@ -335,11 +340,16 @@
     <div class="wrap">
       <div>
         <h2>Testa aí. <em>É de verdade.</em></h2>
-        <p class="texto" style="margin-top:20px">Escolha um tipo de negócio e escreva como se fosse cliente. Tenta perguntar o preço ou pedir para falar com alguém.</p>
+        <p class="texto" style="margin-top:20px">Escolha um tipo de negócio e escreva como se fosse cliente. Pergunta o preço, tenta marcar um horário ou pede um desconto para ver ele chamar a equipe.</p>
         <div class="tabs" role="tablist" aria-label="Tipo de negócio" id="tabs"></div>
         <p class="sugestoes-tit">Ou clique numa pergunta:</p>
         <div class="sugestoes" id="chips"></div>
-        <p class="aviso-demo">Os negócios do teste são fictícios. No seu, o assistente usa as suas informações.</p>
+        <details class="treino">
+          <summary>O que este assistente aprendeu</summary>
+          <p class="treino-aviso">Dados fictícios usados no treino desta demonstração. Preços, convênios e endereços não são reais.</p>
+          <ul id="treino"></ul>
+        </details>
+        <p class="aviso-demo">No seu negócio, o assistente é treinado com as suas informações reais, e você aprova tudo antes de ir ao ar.</p>
       </div>
       <div class="chat" aria-label="Conversa de teste">
         <div class="chat-topo"><span class="av" id="chatAvatar">CS</span><div><strong id="chatNome">Clínica</strong><small>assistente virtual</small></div></div>
@@ -407,6 +417,7 @@
           <a href="#" class="btn" data-wa><svg><use href="#i-wa"/></svg> Chamar no WhatsApp</a>
           <span class="hint">ou preencha ao lado</span>
         </div>
+        <p class="texto" style="margin-top:18px">Prefere e-mail? Escreva para <a href="mailto:contato@whitefox.com.br" data-email>contato@whitefox.com.br</a>.</p>
       </div>
       <form class="lead-form" id="leadForm">
         <div><label for="lNome">Seu nome</label><input type="text" id="lNome" autocomplete="name" maxlength="120" required></div>
@@ -441,7 +452,7 @@
       <p class="origem">Aqui no interior, todo bom atendimento começa com uma prosa.</p>
       <a class="powered" href="https://whitefox.com.br" target="_blank" rel="noopener">powered by <b>WhiteFox</b></a>
     </div>
-    <nav aria-label="Rodapé"><a href="#demo">Testar</a><a href="#contato">Contato</a><a href="privacidade.html">Privacidade</a></nav>
+    <nav aria-label="Rodapé"><a href="#demo">Testar</a><a href="#contato">Contato</a><a href="mailto:contato@whitefox.com.br" data-email>contato@whitefox.com.br</a><a href="privacidade.html">Privacidade</a></nav>
     <small>Indaiatuba · SP. Os negócios do teste são fictícios. Respostas geradas por IA podem conter erros.</small>
   </div>
 </footer>
@@ -456,6 +467,8 @@ const CHAT_URL = API + "/chat";
 const LEAD_URL = API + "/lead";
 
 if (CONF.marca) document.querySelectorAll("[data-marca]").forEach((el) => { el.textContent = CONF.marca; });
+const EMAIL = CONF.emailContato || "contato@whitefox.com.br";
+document.querySelectorAll("[data-email]").forEach((a) => { a.href = "mailto:" + EMAIL; a.textContent = EMAIL; });
 // Com WhatsApp configurado, os links marcados abrem a conversa; sem ele, levam ao formulário
 if (CONF.whatsappContato) {
   const numero = String(CONF.whatsappContato).replace(/\D/g, "");
@@ -483,21 +496,24 @@ const NICHOS = {
     empresa: "Clínica Sorriso Exemplo",
     sigla: "CS",
     saudacao: "Olá! Sou o assistente da Clínica Sorriso Exemplo. Como posso ajudar?",
-    sugestoes: ["Vocês atendem sábado?", "Quero agendar uma limpeza", "Quanto custa a consulta?"]
+    sugestoes: ["Quanto custa a limpeza?", "Aceita Odontoprev?", "Quero agendar uma limpeza", "Estou com muita dor de dente"],
+    treino: ["Avaliação R$ 150 · limpeza R$ 220 · clareamento R$ 890 em 6x", "Convênios Odontoprev e Amil Dental", "Seg a sex, 8h às 18h · Centro de Indaiatuba", "Crianças a partir de 4 anos, terças e quintas", "Urgência, desconto e diagnóstico vão para a equipe"]
   },
   imobiliaria: {
     rotulo: "Imobiliária",
     empresa: "Imobiliária Casa Exemplo",
     sigla: "CE",
     saudacao: "Olá! Sou o assistente da Imobiliária Casa Exemplo. Procura imóvel para alugar ou comprar?",
-    sugestoes: ["Quais documentos preciso para alugar?", "Quero agendar uma visita", "Dá para negociar o valor?"]
+    sugestoes: ["Quais imóveis vocês têm para alugar?", "Aceita fiador?", "Quero visitar a casa do Morada do Sol", "Dá para baixar o aluguel?"],
+    treino: ["3 imóveis: casa no Morada do Sol R$ 2.400, apê no Centro R$ 1.900, casa no Esplanada à venda", "Garantias: seguro-fiança, capitalização ou caução", "Renda mínima de 3x o aluguel · análise em até 2 dias úteis", "Seg a sex 9h às 18h, sábado 9h às 13h", "Negociação e proposta vão para o corretor"]
   },
   oficina: {
     rotulo: "Oficina",
     empresa: "Auto Center Exemplo",
     sigla: "AC",
     saudacao: "Fala! Aqui é o assistente do Auto Center Exemplo. Em que posso ajudar com seu carro?",
-    sugestoes: ["Quanto custa uma revisão?", "Posso deixar o carro hoje?", "Meu carro não liga"]
+    sugestoes: ["Quanto custa a troca de óleo?", "Vocês buscam o carro?", "Quero marcar um alinhamento", "Meu carro não liga"],
+    treino: ["Troca de óleo a partir de R$ 189 · alinhamento R$ 120 · revisão R$ 290", "Garantia de 3 meses ou 5.000 km", "Leva e traz grátis em Indaiatuba acima de R$ 500", "Seg a sex 8h às 17h30, sábado 8h às 12h", "Carro que não liga e garantia vão para a equipe"]
   }
 };
 // As regras e informações de cada negócio ficam no servidor (config/clientes.json), não no navegador.
@@ -524,6 +540,9 @@ function iniciar(chave) {
   $("chatAvatar").textContent = n.sigla;
   msgs.innerHTML = "";
   add(n.saudacao, "bot");
+  const treino = $("treino");
+  treino.innerHTML = "";
+  n.treino.forEach((t) => { const li = document.createElement("li"); li.textContent = t; treino.appendChild(li); });
   const chips = $("chips");
   chips.innerHTML = "";
   n.sugestoes.forEach((s) => {
@@ -536,16 +555,26 @@ function iniciar(chave) {
 
 async function enviar(texto) {
   if (ocupado || !texto.trim()) return;
+  // Aberta como arquivo ou pré-visualização (file:, data:), a página não alcança o servidor do chat
+  if (!/^https?:$/.test(location.protocol)) {
+    add(texto, "user");
+    add("Esta é a pré-visualização do arquivo. Para o chat funcionar, abra http://localhost:8080", "sys");
+    return;
+  }
   ocupado = true; sendBtn.disabled = true;
   add(texto, "user");
   const espera = add("digitando...", "bot");
+  // Uma falha de rede ou do servidor (reinício, túnel instável) ganha uma nova tentativa antes do aviso
+  const pedir = () => fetch(CHAT_URL, {
+    method: "POST",
+    signal: AbortSignal.timeout(90000),
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ cliente: nichoAtual, session_id: sessaoDe(nichoAtual), message: texto })
+  });
   try {
-    const r = await fetch(CHAT_URL, {
-      method: "POST",
-      signal: AbortSignal.timeout(90000),
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ cliente: nichoAtual, session_id: sessaoDe(nichoAtual), message: texto })
-    });
+    let r;
+    try { r = await pedir(); } catch (e) { r = null; }
+    if (!r || r.status >= 500) { await new Promise((ok) => setTimeout(ok, 2500)); r = await pedir(); }
     if (r.status === 429) { espera.remove(); add("Muitas mensagens em pouco tempo. Espera um minutinho e tenta de novo.", "sys"); return; }
     if (!r.ok) throw new Error("HTTP " + r.status);
     const data = await r.json();
@@ -584,7 +613,7 @@ $("leadForm").onsubmit = async (e) => {
     out.className = "ok"; out.textContent = "Recebido! A gente te chama no WhatsApp.";
     $("leadForm").reset();
   } catch (err) {
-    out.className = "hint"; out.textContent = "Não deu para enviar agora. Tenta de novo daqui a pouco.";
+    out.className = "hint"; out.textContent = "Não deu para enviar agora. Tenta de novo daqui a pouco ou escreva para " + EMAIL + ".";
   } finally { btn.disabled = false; }
 };
 </script>
