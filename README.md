@@ -1,6 +1,6 @@
-# Atendimento IA: landing de venda
+# Prosa: landing de venda
 
-Página de venda do assistente de atendimento com IA para WhatsApp, voltada a negócios de Indaiatuba e região.
+Página de venda do Prosa (powered by WhiteFox), assistente de atendimento com IA para WhatsApp, voltada a negócios de Indaiatuba e região.
 
 - `index.html`: a página, com demo de chat ao vivo e formulário de contato.
 - `config.js`: endereço do backend (n8n), marca e WhatsApp comercial.
