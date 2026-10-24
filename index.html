@@ -1,0 +1,592 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atendimento IA | O WhatsApp do seu negócio respondendo depois das 18h</title>
+<meta name="description" content="Assistente para o WhatsApp de clínicas, oficinas, imobiliárias e salões de Indaiatuba e região. Responde na hora, anota pedidos de horário e chama sua equipe quando precisa.">
+<meta name="theme-color" content="#f3ede2">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,800;1,9..144,400;1,9..144,600&family=Inter+Tight:wght@400;500;600;700&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --papel: #f3ede2; --papel-2: #ebe3d4; --branco: #fffdf8; --tinta: #1d1a16; --tinta-2: #4d473f; --fio: #d6ccba;
+    --terra: #b8492a; --terra-2: #9c3b20; --mata: #24493a; --mostarda: #e2a63b; --wa: #1f9d55;
+    --serif: "Fraunces", Georgia, "Times New Roman", serif;
+    --sans: "Inter Tight", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --mao: "Caveat", "Segoe Print", cursive;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --papel: #17150f; --papel-2: #1f1c16; --branco: #23201a; --tinta: #efe7d8; --tinta-2: #b9ae9c; --fio: #3a3429;
+      --terra: #e2734d; --terra-2: #f08a64; --mata: #7fb79c; --mostarda: #ecb655; --wa: #3cc172;
+    }
+  }
+  :root[data-theme="dark"] {
+    --papel: #17150f; --papel-2: #1f1c16; --branco: #23201a; --tinta: #efe7d8; --tinta-2: #b9ae9c; --fio: #3a3429;
+    --terra: #e2734d; --terra-2: #f08a64; --mata: #7fb79c; --mostarda: #ecb655; --wa: #3cc172;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--papel); color: var(--tinta); font: 17px/1.6 var(--sans); -webkit-font-smoothing: antialiased; }
+  a { color: inherit; }
+  p { margin: 0; }
+  .wrap { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
+  h1, h2, h3 { font-family: var(--serif); font-weight: 600; margin: 0; letter-spacing: -.015em; line-height: 1.04; }
+  h1 { font-size: clamp(44px, 7.4vw, 94px); font-weight: 800; letter-spacing: -.03em; }
+  h2 { font-size: clamp(32px, 4.6vw, 56px); }
+  h3 { font-size: 24px; }
+  em { font-style: italic; font-weight: 400; color: var(--terra); }
+  .mao { font-family: var(--mao); font-weight: 700; color: var(--terra); font-size: 26px; line-height: 1.1; }
+  .texto { color: var(--tinta-2); font-size: 19px; max-width: 34em; }
+  section { padding: 104px 0; }
+  .fio-topo { border-top: 1.5px solid var(--tinta); }
+  :focus-visible { outline: 3px solid var(--mostarda); outline-offset: 3px; }
+
+  .btn { display: inline-flex; align-items: center; gap: 10px; padding: 16px 26px; font: 600 17px var(--sans); text-decoration: none; border: 1.5px solid var(--tinta); background: var(--tinta); color: var(--papel); cursor: pointer; border-radius: 4px; box-shadow: 4px 4px 0 var(--terra); transition: transform .12s, box-shadow .12s; }
+  .btn:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--terra); }
+  .btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--terra); }
+  .link-seta { font-weight: 600; text-decoration: none; border-bottom: 2px solid var(--terra); padding-bottom: 2px; }
+  .link-seta:hover { color: var(--terra); }
+  .btn svg, .link-seta svg { width: 20px; height: 20px; }
+
+  /* Topo */
+  header { border-bottom: 1.5px solid var(--tinta); background: var(--papel); position: sticky; top: 0; z-index: 20; }
+  header .wrap { display: flex; align-items: center; justify-content: space-between; height: 70px; gap: 18px; }
+  .marca { font-family: var(--serif); font-weight: 800; font-size: 23px; text-decoration: none; letter-spacing: -.02em; display: inline-flex; align-items: baseline; gap: 2px; }
+  .marca i { color: var(--terra); font-style: normal; }
+  nav { display: flex; gap: 30px; align-items: center; font-weight: 500; font-size: 16px; }
+  nav a { text-decoration: none; }
+  nav a:hover { color: var(--terra); }
+  nav .contato-topo { border: 1.5px solid var(--tinta); padding: 8px 16px; border-radius: 4px; font-weight: 600; }
+  nav .contato-topo:hover { background: var(--tinta); color: var(--papel); }
+
+  /* Abertura */
+  .abertura { padding: 72px 0 0; }
+  .abertura .wrap { display: grid; grid-template-columns: 1.25fr .75fr; gap: 48px; align-items: end; }
+  .local { font-size: 15px; font-weight: 600; color: var(--tinta-2); display: flex; align-items: center; gap: 10px; margin-bottom: 26px; }
+  .local::before { content: ""; width: 34px; height: 1.5px; background: var(--tinta); }
+  .grifo { position: relative; white-space: nowrap; }
+  .grifo svg { position: absolute; left: -2%; bottom: -.12em; width: 104%; height: .32em; color: var(--mostarda); z-index: -1; }
+  .abertura .texto { margin: 30px 0 34px; }
+  .acoes { display: flex; align-items: center; gap: 26px; flex-wrap: wrap; }
+
+  .print { position: relative; transform: rotate(2deg); margin-bottom: -60px; }
+  .print .fita { position: absolute; top: -14px; left: 50%; width: 110px; height: 30px; margin-left: -55px; background: color-mix(in srgb, var(--mostarda) 55%, transparent); transform: rotate(-4deg); z-index: 2; }
+  .zap { background: #e9e1d6; border: 1.5px solid var(--tinta); border-radius: 6px; overflow: hidden; box-shadow: 10px 10px 0 var(--tinta); }
+  .zap-topo { background: #22493a; color: #fff; padding: 12px 14px; display: flex; gap: 10px; align-items: center; font-size: 14px; }
+  .zap-topo b { display: block; font-size: 15px; }
+  .zap-topo span.av { width: 34px; height: 34px; border-radius: 50%; background: var(--mostarda); color: #1d1a16; display: grid; place-items: center; font-weight: 700; }
+  .zap-corpo { padding: 14px 12px 18px; display: flex; flex-direction: column; gap: 7px; }
+  .bal { max-width: 86%; padding: 7px 10px 5px; border-radius: 8px; font-size: 14px; line-height: 1.38; color: #1d1a16; }
+  .bal small { display: block; text-align: right; font-size: 10.5px; color: #667069; }
+  .bal.c { align-self: flex-end; background: #d8f8cf; }
+  .bal.a { align-self: flex-start; background: #fff; }
+  .nota { position: absolute; left: -54px; top: -96px; width: 230px; transform: rotate(-5deg); }
+  .nota svg { width: 60px; height: 40px; color: var(--terra); display: block; margin: 2px 0 0 26px; }
+
+  .cidades { margin-top: 110px; border-top: 1.5px solid var(--tinta); border-bottom: 1.5px solid var(--tinta); overflow: hidden; background: var(--tinta); color: var(--papel); }
+  .cidades .linha { display: flex; gap: 44px; padding: 14px 0; white-space: nowrap; font-family: var(--serif); font-size: 22px; font-style: italic; animation: corre 38s linear infinite; width: max-content; }
+  .cidades .linha span::after { content: "✶"; font-style: normal; color: var(--mostarda); margin-left: 44px; font-size: 16px; }
+  @keyframes corre { to { transform: translateX(-50%); } }
+
+  /* Um dia */
+  .dia-cab { display: grid; grid-template-columns: .9fr 1.1fr; gap: 48px; align-items: end; margin-bottom: 56px; }
+  .linha-tempo { list-style: none; margin: 0; padding: 0; border-top: 1.5px solid var(--tinta); }
+  .linha-tempo li { display: grid; grid-template-columns: 120px 1fr 220px; gap: 24px; align-items: baseline; padding: 22px 0; border-bottom: 1px solid var(--fio); }
+  .hora { font-family: var(--serif); font-size: 30px; font-weight: 600; }
+  .hora small { display: block; font-family: var(--sans); font-size: 13px; color: var(--tinta-2); font-weight: 500; }
+  .fala { font-size: 19px; }
+  .status { font-size: 15px; font-weight: 600; justify-self: end; text-align: right; }
+  .status.ok { color: var(--mata); }
+  .status.nao { color: var(--terra); }
+  .status.nao::before { content: "✕ "; }
+  .status.ok::before { content: "✓ "; }
+  .conclusao { margin-top: 34px; display: flex; gap: 20px; align-items: baseline; flex-wrap: wrap; }
+  .conclusao p { font-family: var(--serif); font-size: clamp(22px, 2.6vw, 30px); max-width: 30em; }
+
+  /* O que faz */
+  .faz { background: var(--branco); border-top: 1.5px solid var(--tinta); border-bottom: 1.5px solid var(--tinta); }
+  .faz .wrap { display: grid; grid-template-columns: .8fr 1.2fr; gap: 64px; }
+  .faz .fixo { position: sticky; top: 110px; align-self: start; display: grid; gap: 20px; }
+  .itens { list-style: none; margin: 0; padding: 0; }
+  .itens li { display: grid; grid-template-columns: 90px 1fr; gap: 20px; padding: 30px 0; border-top: 1px solid var(--fio); }
+  .itens li:first-child { border-top: 0; padding-top: 0; }
+  .num { font-family: var(--serif); font-size: 54px; line-height: .9; color: var(--terra); font-weight: 400; font-style: italic; }
+  .itens h3 { margin-bottom: 8px; }
+  .itens p { color: var(--tinta-2); }
+
+  /* Demo */
+  .demo .wrap { display: grid; grid-template-columns: .85fr 1.15fr; gap: 64px; align-items: start; }
+  .tabs { display: flex; gap: 26px; border-bottom: 1.5px solid var(--tinta); margin: 34px 0 20px; }
+  .tab { background: none; border: 0; padding: 10px 0; margin-bottom: -1.5px; font: 600 17px var(--sans); color: var(--tinta-2); cursor: pointer; border-bottom: 3px solid transparent; }
+  .tab[aria-selected="true"] { color: var(--tinta); border-bottom-color: var(--terra); }
+  .sugestoes { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
+  .sugestoes-tit { font-size: 14px; color: var(--tinta-2); margin-bottom: 6px; }
+  .chip { background: none; border: 0; padding: 6px 0; font: 500 17px var(--sans); color: var(--tinta); cursor: pointer; text-align: left; border-bottom: 1px dashed var(--fio); }
+  .chip::before { content: "→ "; color: var(--terra); }
+  .chip:hover { color: var(--terra); }
+  .aviso-demo { font-size: 14px; color: var(--tinta-2); margin-top: 22px; }
+  .chat { background: #e9e1d6; border: 1.5px solid var(--tinta); border-radius: 6px; box-shadow: 10px 10px 0 var(--mata); display: flex; flex-direction: column; height: 560px; overflow: hidden; }
+  .chat-topo { background: #22493a; color: #fff; padding: 13px 16px; display: flex; gap: 12px; align-items: center; }
+  .chat-topo .av { width: 38px; height: 38px; border-radius: 50%; background: var(--mostarda); color: #1d1a16; display: grid; place-items: center; font-weight: 700; font-size: 14px; }
+  .chat-topo strong { display: block; font-size: 16px; }
+  .chat-topo small { opacity: .8; font-size: 13px; }
+  .msgs { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+  .msg { max-width: 82%; padding: 8px 11px; border-radius: 8px; font-size: 15px; line-height: 1.45; white-space: pre-wrap; word-wrap: break-word; color: #1d1a16; }
+  .msg.user { align-self: flex-end; background: #d8f8cf; }
+  .msg.bot { align-self: flex-start; background: #fff; }
+  .msg.sys { align-self: center; background: #fbecc8; color: #6a4a10; font-size: 13px; text-align: center; border-radius: 6px; padding: 4px 10px; }
+  .chat-form { display: flex; gap: 8px; padding: 10px; background: #f0eae0; border-top: 1px solid #d7cdbd; }
+  .chat-form input { flex: 1; min-width: 0; font: 16px var(--sans); padding: 11px 14px; border: 1px solid #cfc4b2; border-radius: 22px; background: #fff; color: #1d1a16; }
+  .chat-form button { border: 0; border-radius: 22px; padding: 0 20px; background: #22493a; color: #fff; font: 600 15px var(--sans); cursor: pointer; }
+  .chat-form button:disabled { opacity: .5; }
+
+  /* Para quem */
+  .quem { background: var(--papel-2); border-top: 1.5px solid var(--tinta); }
+  .tabela { border-top: 1.5px solid var(--tinta); margin-top: 48px; }
+  .tabela > div { display: grid; grid-template-columns: 1fr 1.6fr; gap: 32px; padding: 26px 0; border-bottom: 1px solid var(--fio); align-items: baseline; }
+  .tabela h3 { font-size: 30px; }
+  .tabela p { color: var(--tinta-2); font-size: 18px; }
+
+  /* Implantação */
+  .passos { list-style: none; margin: 56px 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border-top: 1.5px solid var(--tinta); }
+  .passos li { padding: 26px 24px 0 0; position: relative; }
+  .passos li::before { content: ""; position: absolute; top: -8px; left: 0; width: 14px; height: 14px; border-radius: 50%; background: var(--papel); border: 2px solid var(--tinta); }
+  .passos li:first-child::before { background: var(--terra); border-color: var(--terra); }
+  .passos .mao { display: block; font-size: 22px; margin-bottom: 6px; }
+  .passos h3 { font-size: 22px; margin-bottom: 8px; }
+  .passos p { color: var(--tinta-2); font-size: 16px; }
+
+  /* Carta */
+  .carta { background: var(--tinta); color: var(--papel); }
+  .carta .wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; }
+  .carta h2 { color: var(--papel); }
+  .carta em { color: var(--mostarda); }
+  .carta .corpo { display: grid; gap: 18px; font-size: 19px; color: color-mix(in srgb, var(--papel) 82%, transparent); }
+  .carta .assina { font-family: var(--mao); font-size: 30px; color: var(--mostarda); }
+  .inclui { columns: 2; column-gap: 32px; margin: 8px 0 0; padding: 0; list-style: none; font-size: 16px; }
+  .inclui li { break-inside: avoid; padding: 8px 0; border-bottom: 1px solid color-mix(in srgb, var(--papel) 18%, transparent); }
+
+  /* Contato */
+  .contato .wrap { display: grid; grid-template-columns: .9fr 1.1fr; gap: 64px; align-items: start; }
+  .contato .texto { margin-top: 20px; }
+  .via-wa { margin-top: 34px; display: grid; gap: 10px; }
+  .via-wa .btn { background: var(--wa); border-color: var(--tinta); color: #fff; }
+  form.lead-form { background: var(--branco); border: 1.5px solid var(--tinta); border-radius: 6px; padding: 32px; display: grid; gap: 18px; box-shadow: 10px 10px 0 var(--terra); }
+  form.lead-form label { font-size: 15px; font-weight: 600; display: block; margin-bottom: 6px; }
+  form.lead-form input[type=text], form.lead-form input[type=tel], form.lead-form textarea { width: 100%; font: 17px var(--sans); color: var(--tinta); background: transparent; border: 0; border-bottom: 1.5px solid var(--tinta); padding: 8px 2px; border-radius: 0; }
+  form.lead-form textarea { resize: vertical; }
+  form.lead-form input:focus, form.lead-form textarea:focus { outline: none; border-bottom-color: var(--terra); }
+  .consent { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; color: var(--tinta-2); }
+  .consent input { margin-top: 4px; width: 18px; height: 18px; accent-color: var(--terra); }
+  .consent a { color: var(--terra); }
+  .hint { font-size: 15px; color: var(--tinta-2); }
+  .ok { color: var(--mata); font-weight: 700; }
+
+  /* Dúvidas */
+  .duvidas .wrap { display: grid; grid-template-columns: .8fr 1.2fr; gap: 64px; }
+  details { border-bottom: 1px solid var(--fio); padding: 22px 0; }
+  details:first-child { border-top: 1.5px solid var(--tinta); }
+  summary { cursor: pointer; list-style: none; font-family: var(--serif); font-size: 22px; font-weight: 600; display: flex; justify-content: space-between; gap: 16px; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "+"; font-family: var(--sans); color: var(--terra); font-weight: 400; font-size: 28px; line-height: .9; }
+  details[open] summary::after { content: "−"; }
+  details p { color: var(--tinta-2); margin-top: 12px; max-width: 40em; }
+
+  footer { border-top: 1.5px solid var(--tinta); padding: 40px 0 46px; font-size: 15px; }
+  footer .wrap { display: flex; justify-content: space-between; gap: 20px 40px; flex-wrap: wrap; align-items: baseline; }
+  footer .marca { font-size: 30px; }
+  footer nav { gap: 22px; font-size: 15px; }
+  footer small { color: var(--tinta-2); width: 100%; }
+
+  .wa-float { position: fixed; right: 18px; bottom: 18px; z-index: 30; width: 58px; height: 58px; border-radius: 50%; background: var(--wa); color: #fff; display: grid; place-items: center; border: 1.5px solid var(--tinta); box-shadow: 3px 3px 0 var(--tinta); }
+  .wa-float svg { width: 30px; height: 30px; }
+  .wa-float[hidden] { display: none; }
+
+  @media (max-width: 960px) {
+    section { padding: 76px 0; }
+    .abertura .wrap, .dia-cab, .faz .wrap, .demo .wrap, .carta .wrap, .contato .wrap, .duvidas .wrap { grid-template-columns: 1fr; }
+    .print { margin: 96px auto -40px; max-width: 380px; }
+    .nota { left: auto; right: -6px; top: -64px; transform: rotate(4deg); text-align: right; }
+    .nota svg { display: none; }
+    .cidades { margin-top: 90px; }
+    .faz .fixo { position: static; }
+    .linha-tempo li { grid-template-columns: 90px 1fr; }
+    .status { grid-column: 2; justify-self: start; text-align: left; }
+    .passos { grid-template-columns: 1fr 1fr; row-gap: 34px; border-top: 0; }
+    .passos li { border-top: 1.5px solid var(--tinta); }
+    nav a:not(.contato-topo) { display: none; }
+  }
+  @media (max-width: 600px) {
+    body { font-size: 16px; }
+    .texto { font-size: 17px; }
+    .abertura { padding-top: 44px; }
+    .tabela > div { grid-template-columns: 1fr; gap: 6px; }
+    header .marca { font-size: 20px; white-space: nowrap; }
+    nav .contato-topo { white-space: nowrap; padding: 7px 12px; font-size: 15px; }
+    .nota { top: -70px; }
+    .passos { grid-template-columns: 1fr; }
+    .inclui { columns: 1; }
+    .hora { font-size: 24px; }
+    .linha-tempo li { grid-template-columns: 70px 1fr; gap: 14px; }
+    .fala { font-size: 17px; }
+    .chat { height: 500px; box-shadow: 6px 6px 0 var(--mata); }
+    form.lead-form { padding: 24px; box-shadow: 6px 6px 0 var(--terra); }
+    .itens li { grid-template-columns: 60px 1fr; }
+    .num { font-size: 40px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .cidades .linha { animation: none; flex-wrap: wrap; white-space: normal; width: auto; justify-content: center; }
+    .btn { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-wa" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4a.5.5 0 0 0 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.7a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .1-1.3c0-.1-.2-.2-.5-.3z"/></symbol>
+  <symbol id="i-seta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+</svg>
+
+<header>
+  <div class="wrap">
+    <a href="#" class="marca"><span data-marca>Atendimento IA</span><i>.</i></a>
+    <nav aria-label="Menu principal">
+      <a href="#dia">O problema</a>
+      <a href="#demo">Testar</a>
+      <a href="#como">Como implanta</a>
+      <a href="#duvidas">Dúvidas</a>
+      <a href="#contato" class="contato-topo" data-wa>Fale com a gente</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="abertura" style="padding-bottom:0">
+    <div class="wrap">
+      <div>
+        <p class="local">Indaiatuba e região · DDD 19</p>
+        <h1>Seu WhatsApp não precisa fechar às <span class="grifo">18h<svg viewBox="0 0 200 20" preserveAspectRatio="none" aria-hidden="true"><path d="M2 14 C 50 4, 120 4, 198 12" stroke="currentColor" stroke-width="14" fill="none" stroke-linecap="round"/></svg></span>.</h1>
+        <p class="texto">Um assistente que responde seus clientes na hora, com as informações do seu negócio. Ele tira dúvidas, anota quem quer marcar horário e chama alguém da equipe quando o assunto pede uma pessoa.</p>
+        <div class="acoes">
+          <a href="#demo" class="btn">Testar o assistente <svg><use href="#i-seta"/></svg></a>
+          <a href="#contato" class="link-seta" data-wa>Prefiro conversar com alguém</a>
+        </div>
+      </div>
+
+      <div class="print" role="img" aria-label="Exemplo ilustrativo: cliente pergunta às 21h14 se a clínica atende sábado e o assistente responde e anota um pedido de horário">
+        <span class="fita" aria-hidden="true"></span>
+        <p class="nota mao" aria-hidden="true">isso foi às 21h14, com a recepção fechada
+          <svg viewBox="0 0 60 40" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 4 C 4 18, 14 30, 40 36"/><path d="M30 38 L41 36 L35 27"/></svg></p>
+        <div class="zap" aria-hidden="true">
+          <div class="zap-topo"><span class="av">CS</span><div><b>Clínica Sorriso</b>online</div></div>
+          <div class="zap-corpo">
+            <div class="bal c">boa noite! vcs atendem sábado? moro no Morada do Sol e só consigo fim de semana<small>21:14</small></div>
+            <div class="bal a">Boa noite! Sábado a gente não abre, mas atendemos de segunda a sexta até as 18h. Quer que eu deixe anotado um horário no fim da tarde?<small>21:14</small></div>
+            <div class="bal c">pode ser terça depois das 17h. sou a Juliana<small>21:15</small></div>
+            <div class="bal a">Anotado, Juliana: limpeza, terça depois das 17h. A equipe confirma com você amanhã cedo.<small>21:15</small></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cidades" aria-label="Cidades: Indaiatuba, Salto, Itu, Elias Fausto, Monte Mor, Campinas">
+      <div class="linha" aria-hidden="true">
+        <span>Indaiatuba</span><span>Salto</span><span>Itu</span><span>Elias Fausto</span><span>Monte Mor</span><span>Campinas</span>
+        <span>Indaiatuba</span><span>Salto</span><span>Itu</span><span>Elias Fausto</span><span>Monte Mor</span><span>Campinas</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="dia">
+    <div class="wrap">
+      <div class="dia-cab">
+        <h2>Um dia comum no WhatsApp de uma <em>clínica</em>.</h2>
+        <p class="texto">Quem atende no balcão sabe: as mensagens não esperam o expediente. Olha quantas ficariam sem resposta.</p>
+      </div>
+      <ol class="linha-tempo">
+        <li><span class="hora">07:42<small>terça</small></span><span class="fala">"Vocês abrem que horas hoje?"</span><span class="status nao">Recepção ainda não chegou</span></li>
+        <li><span class="hora">12:10<small>terça</small></span><span class="fala">"Aceita convênio? Qual?"</span><span class="status ok">Respondida às 15h</span></li>
+        <li><span class="hora">18:03<small>terça</small></span><span class="fala">"Queria marcar uma limpeza essa semana"</span><span class="status nao">Equipe já saiu</span></li>
+        <li><span class="hora">21:14<small>terça</small></span><span class="fala">"Atendem sábado?"</span><span class="status nao">Vista só no dia seguinte</span></li>
+        <li><span class="hora">10:30<small>domingo</small></span><span class="fala">"Meu filho tá com dor de dente, o que eu faço?"</span><span class="status nao">Sem resposta até segunda</span></li>
+      </ol>
+      <div class="conclusao">
+        <p>Cada uma dessas é um cliente que pode ir para a clínica da rua de baixo. Com o assistente, todas têm resposta em segundos, e as que precisam de gente chegam avisadas para a equipe.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="faz">
+    <div class="wrap">
+      <div class="fixo">
+        <h2>O que ele faz <em>por você</em>.</h2>
+        <p class="texto">Ele fala só o que você aprovou. O que ele não sabe, ele não inventa: passa para a sua equipe.</p>
+      </div>
+      <ol class="itens">
+        <li><span class="num">01</span><div><h3>Responde as perguntas de sempre</h3><p>Horário, endereço, serviços, convênios, formas de pagamento. Do jeito que você responderia, a qualquer hora.</p></div></li>
+        <li><span class="num">02</span><div><h3>Anota quem quer marcar horário</h3><p>Pergunta o nome, o serviço e o melhor dia, confirma com o cliente e deixa o pedido pronto para a equipe ligar ou responder.</p></div></li>
+        <li><span class="num">03</span><div><h3>Chama alguém quando precisa</h3><p>Pergunta de preço, reclamação, urgência ou "quero falar com uma pessoa" viram um aviso no celular da equipe, com a conversa junto.</p></div></li>
+        <li><span class="num">04</span><div><h3>Lembra da conversa</h3><p>Se o cliente volta uma hora depois, ele continua de onde parou, sem perguntar tudo de novo.</p></div></li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="demo" class="demo">
+    <div class="wrap">
+      <div>
+        <h2>Testa aí. <em>É de verdade.</em></h2>
+        <p class="texto" style="margin-top:20px">Escolha um tipo de negócio e escreva como se fosse cliente. Tenta perguntar o preço ou pedir para falar com alguém.</p>
+        <div class="tabs" role="tablist" aria-label="Tipo de negócio" id="tabs"></div>
+        <p class="sugestoes-tit">Ou clique numa pergunta:</p>
+        <div class="sugestoes" id="chips"></div>
+        <p class="aviso-demo">Os negócios do teste são fictícios. No seu, o assistente usa as suas informações.</p>
+      </div>
+      <div class="chat" aria-label="Conversa de teste">
+        <div class="chat-topo"><span class="av" id="chatAvatar">CS</span><div><strong id="chatNome">Clínica</strong><small>assistente virtual</small></div></div>
+        <div class="msgs" id="msgs" aria-live="polite"></div>
+        <form class="chat-form" id="chatForm">
+          <input type="text" id="msgInput" placeholder="Mensagem" autocomplete="off" maxlength="1000" required aria-label="Mensagem">
+          <button type="submit" id="sendBtn">Enviar</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section class="quem">
+    <div class="wrap">
+      <h2>Feito para quem vive <em>no WhatsApp</em>.</h2>
+      <div class="tabela">
+        <div><h3>Clínicas e consultórios</h3><p>Horários, convênios e pedidos de consulta. Urgência e pedido de receita vão direto para a equipe.</p></div>
+        <div><h3>Oficinas e auto centers</h3><p>"Posso deixar o carro hoje?", serviços e marcas atendidas. Orçamento fica com o mecânico.</p></div>
+        <div><h3>Imobiliárias</h3><p>Documentos para alugar e pedidos de visita. Negociação de valor fica com o corretor.</p></div>
+        <div><h3>Salões e estética</h3><p>Serviços, horários e pedidos de horário, inclusive remarcação, sem deixar a cliente esperando.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="como">
+    <div class="wrap">
+      <h2>Como a gente <em>coloca no ar</em>.</h2>
+      <p class="texto" style="margin-top:18px">Você não precisa aprender sistema novo. Continua usando o WhatsApp.</p>
+      <ol class="passos">
+        <li><span class="mao">primeiro</span><h3>Um café ou uma chamada</h3><p>Entendemos como seu atendimento funciona hoje. Pessoalmente em Indaiatuba e região, ou por vídeo.</p></li>
+        <li><span class="mao">depois</span><h3>Configuração</h3><p>Cadastramos serviços, horários, respostas que você aprova e quando chamar a equipe.</p></li>
+        <li><span class="mao">antes de ligar</span><h3>Teste com conversas reais</h3><p>Usamos as perguntas que seus clientes fazem de verdade e ajustamos até ficar do seu jeito.</p></li>
+        <li><span class="mao">no ar</span><h3>Acompanhamento</h3><p>Ligamos no seu WhatsApp e seguimos ajustando nas primeiras semanas.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="carta">
+    <div class="wrap">
+      <h2>Não é para trocar sua recepção. É para ela <em>não ficar sozinha</em>.</h2>
+      <div class="corpo">
+        <p>Ninguém quer falar com robô quando o assunto é sério, e o assistente sabe disso. Ele cuida da pergunta repetida e da mensagem das 21h, e deixa o resto com quem entende do seu negócio.</p>
+        <p>A proposta é feita sob medida. Inclui:</p>
+        <ul class="inclui">
+          <li>Configuração com os seus dados</li>
+          <li>WhatsApp oficial da empresa</li>
+          <li>Aviso para a equipe no celular</li>
+          <li>Pedidos de horário organizados</li>
+          <li>Chat também no seu site</li>
+          <li>Ajustes nas primeiras semanas</li>
+          <li>Cuidado com a LGPD</li>
+          <li>Suporte com gente daqui</li>
+        </ul>
+        <p class="assina">até mais, <span data-marca>Atendimento IA</span></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="contato" class="contato">
+    <div class="wrap">
+      <div>
+        <h2>Bora conversar sobre o <em>seu</em> atendimento?</h2>
+        <p class="texto">Conta o tipo de negócio e como vocês atendem hoje. A gente chama você no WhatsApp com uma proposta, sem compromisso.</p>
+        <div class="via-wa" id="viaWa" hidden>
+          <a href="#" class="btn" data-wa><svg><use href="#i-wa"/></svg> Chamar no WhatsApp</a>
+          <span class="hint">ou preencha ao lado</span>
+        </div>
+      </div>
+      <form class="lead-form" id="leadForm">
+        <div><label for="lNome">Seu nome</label><input type="text" id="lNome" autocomplete="name" maxlength="120" required></div>
+        <div><label for="lTel">WhatsApp</label><input type="tel" id="lTel" autocomplete="tel" maxlength="30" required placeholder="(19) 90000-0000"></div>
+        <div><label for="lSeg">Tipo de negócio</label><input type="text" id="lSeg" maxlength="120" required placeholder="Ex.: oficina no Jardim Morada do Sol"></div>
+        <div><label for="lObs">Como vocês atendem hoje? (opcional)</label><textarea id="lObs" rows="2" maxlength="1000"></textarea></div>
+        <label class="consent"><input type="checkbox" id="lLgpd" required> <span>Autorizo o uso destes dados só para retornar este contato, conforme a <a href="privacidade.html">política de privacidade</a>.</span></label>
+        <div><button class="btn" type="submit" id="leadBtn">Quero uma proposta <svg><use href="#i-seta"/></svg></button></div>
+        <div id="leadMsg" class="hint" role="status"></div>
+      </form>
+    </div>
+  </section>
+
+  <section id="duvidas" class="duvidas" style="padding-top:40px">
+    <div class="wrap">
+      <h2>Perguntas que <em>sempre</em> aparecem.</h2>
+      <div>
+        <details><summary>Continuo usando o meu número?</summary><p>Sim, dá para usar o número da empresa pela API oficial do WhatsApp. Na implantação a gente explica o que muda no aparelho e como a equipe continua atendendo.</p></details>
+        <details><summary>E se a IA responder errado?</summary><p>Pode acontecer, como acontece com qualquer pessoa. Por isso ela responde só com o que você aprovou e passa para a equipe quando não tem certeza, quando o assunto é preço ou quando o cliente pede alguém.</p></details>
+        <details><summary>Ela marca direto na minha agenda?</summary><p>Ela anota o pedido com nome, serviço e o melhor dia, e a equipe confirma o horário. Ligar numa agenda online dá para combinar na proposta.</p></details>
+        <details><summary>Meus clientes vão saber que é um assistente?</summary><p>A gente recomenda que sim. Ele se apresenta como assistente virtual, o que evita mal-entendido e passa mais confiança.</p></details>
+        <details><summary>E os dados dos meus clientes?</summary><p>Guardamos só o necessário para o atendimento. Para clínicas e outros casos sensíveis, o contrato tem cláusula de tratamento de dados (LGPD).</p></details>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <a href="#" class="marca"><span data-marca>Atendimento IA</span><i>.</i></a>
+    <nav aria-label="Rodapé"><a href="#demo">Testar</a><a href="#contato">Contato</a><a href="privacidade.html">Privacidade</a></nav>
+    <small>Indaiatuba · SP. Os negócios do teste são fictícios. Respostas geradas por IA podem conter erros.</small>
+  </div>
+</footer>
+
+<a class="wa-float" id="waFloat" href="#" hidden target="_blank" rel="noopener" aria-label="Falar no WhatsApp"><svg><use href="#i-wa"/></svg></a>
+
+<script src="config.js"></script>
+<script>
+const CONF = window.ATENDIMENTO || {};
+const API = CONF.api || "/webhook";
+const CHAT_URL = API + "/chat";
+const LEAD_URL = API + "/lead";
+
+if (CONF.marca) document.querySelectorAll("[data-marca]").forEach((el) => { el.textContent = CONF.marca; });
+// Com WhatsApp configurado, os links marcados abrem a conversa; sem ele, levam ao formulário
+if (CONF.whatsappContato) {
+  const numero = String(CONF.whatsappContato).replace(/\D/g, "");
+  const link = "https://wa.me/" + numero + "?text=" + encodeURIComponent("Oi! Vi o site e quero saber como o assistente funcionaria no meu negócio.");
+  document.querySelectorAll("[data-wa]").forEach((a) => { a.href = link; a.target = "_blank"; a.rel = "noopener"; });
+  const f = document.getElementById("waFloat"); f.href = link; f.hidden = false;
+  document.getElementById("viaWa").hidden = false;
+}
+
+// Uma conversa por segmento, mantida enquanto a aba estiver aberta (o servidor guarda o histórico)
+function sessaoDe(chave) {
+  const nome = "atendimento-sessao-" + chave;
+  try {
+    let id = sessionStorage.getItem(nome);
+    if (!id) { id = crypto.randomUUID(); sessionStorage.setItem(nome, id); }
+    return id;
+  } catch (e) {
+    return (sessaoDe.mem = sessaoDe.mem || {})[chave] ||= crypto.randomUUID();
+  }
+}
+
+const NICHOS = {
+  clinica: {
+    rotulo: "Clínica",
+    empresa: "Clínica Sorriso Exemplo",
+    sigla: "CS",
+    saudacao: "Olá! Sou o assistente da Clínica Sorriso Exemplo. Como posso ajudar?",
+    sugestoes: ["Vocês atendem sábado?", "Quero agendar uma limpeza", "Quanto custa a consulta?"]
+  },
+  imobiliaria: {
+    rotulo: "Imobiliária",
+    empresa: "Imobiliária Casa Exemplo",
+    sigla: "CE",
+    saudacao: "Olá! Sou o assistente da Imobiliária Casa Exemplo. Procura imóvel para alugar ou comprar?",
+    sugestoes: ["Quais documentos preciso para alugar?", "Quero agendar uma visita", "Dá para negociar o valor?"]
+  },
+  oficina: {
+    rotulo: "Oficina",
+    empresa: "Auto Center Exemplo",
+    sigla: "AC",
+    saudacao: "Fala! Aqui é o assistente do Auto Center Exemplo. Em que posso ajudar com seu carro?",
+    sugestoes: ["Quanto custa uma revisão?", "Posso deixar o carro hoje?", "Meu carro não liga"]
+  }
+};
+// As regras e informações de cada negócio ficam no servidor (config/clientes.json), não no navegador.
+
+const $ = (id) => document.getElementById(id);
+const msgs = $("msgs"), input = $("msgInput"), sendBtn = $("sendBtn"), tabs = $("tabs");
+let nichoAtual = "clinica";
+let ocupado = false;
+
+function add(texto, tipo) {
+  const d = document.createElement("div");
+  d.className = "msg " + tipo;
+  d.textContent = texto;
+  msgs.appendChild(d);
+  msgs.scrollTop = msgs.scrollHeight;
+  return d;
+}
+
+function iniciar(chave) {
+  nichoAtual = chave;
+  const n = NICHOS[chave];
+  tabs.querySelectorAll(".tab").forEach((t) => t.setAttribute("aria-selected", String(t.dataset.nicho === chave)));
+  $("chatNome").textContent = n.empresa;
+  $("chatAvatar").textContent = n.sigla;
+  msgs.innerHTML = "";
+  add(n.saudacao, "bot");
+  const chips = $("chips");
+  chips.innerHTML = "";
+  n.sugestoes.forEach((s) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "chip"; b.textContent = s;
+    b.onclick = () => enviar(s);
+    chips.appendChild(b);
+  });
+}
+
+async function enviar(texto) {
+  if (ocupado || !texto.trim()) return;
+  ocupado = true; sendBtn.disabled = true;
+  add(texto, "user");
+  const espera = add("digitando...", "bot");
+  try {
+    const r = await fetch(CHAT_URL, {
+      method: "POST",
+      signal: AbortSignal.timeout(90000),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ cliente: nichoAtual, session_id: sessaoDe(nichoAtual), message: texto })
+    });
+    if (r.status === 429) { espera.remove(); add("Muitas mensagens em pouco tempo. Espera um minutinho e tenta de novo.", "sys"); return; }
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    const data = await r.json();
+    espera.textContent = data.reply || "";
+    if (data.agendamento) add("Pedido de horário enviado para a equipe confirmar", "sys");
+    else if (data.handoff) add("Conversa passada para alguém da equipe", "sys");
+  } catch (e) {
+    espera.remove();
+    add("Não consegui responder agora. Tenta de novo daqui a pouco.", "sys");
+  } finally {
+    ocupado = false; sendBtn.disabled = false; input.focus();
+  }
+}
+
+Object.entries(NICHOS).forEach(([k, v]) => {
+  const b = document.createElement("button");
+  b.type = "button"; b.className = "tab"; b.role = "tab"; b.dataset.nicho = k; b.textContent = v.rotulo;
+  b.onclick = () => iniciar(k);
+  tabs.appendChild(b);
+});
+$("chatForm").onsubmit = (e) => { e.preventDefault(); const t = input.value; input.value = ""; enviar(t); };
+iniciar("clinica");
+
+$("leadForm").onsubmit = async (e) => {
+  e.preventDefault();
+  const btn = $("leadBtn"), out = $("leadMsg");
+  btn.disabled = true; out.className = "hint"; out.textContent = "Enviando...";
+  try {
+    const r = await fetch(LEAD_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nome: $("lNome").value, telefone: $("lTel").value, segmento: $("lSeg").value, observacao: $("lObs").value, consentimento: $("lLgpd").checked })
+    });
+    if (r.status === 429) throw new Error("limite");
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    out.className = "ok"; out.textContent = "Recebido! A gente te chama no WhatsApp.";
+    $("leadForm").reset();
+  } catch (err) {
+    out.className = "hint"; out.textContent = "Não deu para enviar agora. Tenta de novo daqui a pouco.";
+  } finally { btn.disabled = false; }
+};
+</script>
+</body>
+</html>
