@@ -110,7 +110,11 @@
   .itens p { color: var(--tinta-2); }
 
   /* Demo */
-  .demo .wrap { display: grid; grid-template-columns: .85fr 1.15fr; gap: 64px; align-items: start; }
+  .video { padding-bottom: 0; }
+.video .wrap { display: grid; gap: 32px; justify-items: center; text-align: center; }
+.video-moldura { width: 100%; max-width: 960px; border: 1.5px solid var(--tinta); border-radius: 14px; overflow: hidden; background: var(--tinta); box-shadow: 8px 8px 0 var(--tinta); }
+.video-moldura video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; }
+.demo .wrap { display: grid; grid-template-columns: .85fr 1.15fr; gap: 64px; align-items: start; }
   .tabs { display: flex; gap: 26px; border-bottom: 1.5px solid var(--tinta); margin: 34px 0 20px; }
   .tab { background: none; border: 0; padding: 10px 0; margin-bottom: -1.5px; font: 600 17px var(--sans); color: var(--tinta-2); cursor: pointer; border-bottom: 3px solid transparent; }
   .tab[aria-selected="true"] { color: var(--tinta); border-bottom-color: var(--terra); }
@@ -333,6 +337,18 @@
         <li><span class="num">03</span><div><h3>Chama alguém quando precisa</h3><p>Pergunta de preço, reclamação, urgência ou "quero falar com uma pessoa" viram um aviso no celular da equipe, com a conversa junto.</p></div></li>
         <li><span class="num">04</span><div><h3>Lembra da conversa</h3><p>Se o cliente volta uma hora depois, ele continua de onde parou, sem perguntar tudo de novo.</p></div></li>
       </ol>
+    </div>
+  </section>
+
+  <section id="video" class="video">
+    <div class="wrap">
+      <h2>O Prosa em <em>22 segundos</em>.</h2>
+      <div class="video-moldura">
+        <video controls playsinline preload="none" poster="prosa.jpg" width="1920" height="1080">
+          <source src="prosa.mp4" type="video/mp4">
+          <a href="prosa.mp4">Baixar o vídeo</a>
+        </video>
+      </div>
     </div>
   </section>
 
