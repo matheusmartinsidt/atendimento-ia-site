@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Atendimento IA | O WhatsApp do seu negócio respondendo depois das 18h</title>
+<title>Prosa | O WhatsApp do seu negócio respondendo depois das 18h</title>
 <meta name="description" content="Assistente para o WhatsApp de clínicas, oficinas, imobiliárias e salões de Indaiatuba e região. Responde na hora, anota pedidos de horário e chama sua equipe quando precisa.">
 <meta name="theme-color" content="#f3ede2">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -200,7 +200,11 @@
   footer .marca { font-size: 30px; }
   footer nav { gap: 22px; font-size: 15px; }
   footer small { color: var(--tinta-2); width: 100%; }
-
+  .assinatura-marca { display: grid; gap: 6px; }
+  .origem { color: var(--tinta-2); font-size: 15px; max-width: 30em; }
+  .powered { font-size: 14px; color: var(--tinta-2); text-decoration: none; letter-spacing: .02em; }
+  .powered b { color: var(--tinta); font-weight: 700; }
+  .powered:hover b { color: var(--terra); }
   .wa-float { position: fixed; right: 18px; bottom: 18px; z-index: 30; width: 58px; height: 58px; border-radius: 50%; background: var(--wa); color: #fff; display: grid; place-items: center; border: 1.5px solid var(--tinta); box-shadow: 3px 3px 0 var(--tinta); }
   .wa-float svg { width: 30px; height: 30px; }
   .wa-float[hidden] { display: none; }
@@ -253,7 +257,7 @@
 
 <header>
   <div class="wrap">
-    <a href="#" class="marca"><span data-marca>Atendimento IA</span><i>.</i></a>
+    <a href="#" class="marca"><span data-marca>Prosa</span><i>.</i></a>
     <nav aria-label="Menu principal">
       <a href="#dia">O problema</a>
       <a href="#demo">Testar</a>
@@ -397,7 +401,7 @@
           <li>Cuidado com a LGPD</li>
           <li>Suporte com gente daqui</li>
         </ul>
-        <p class="assina">até mais, <span data-marca>Atendimento IA</span></p>
+        <p class="assina">bora uma prosa? equipe <span data-marca>Prosa</span></p>
       </div>
     </div>
   </section>
@@ -440,7 +444,11 @@
 
 <footer>
   <div class="wrap">
-    <a href="#" class="marca"><span data-marca>Atendimento IA</span><i>.</i></a>
+    <div class="assinatura-marca">
+      <a href="#" class="marca"><span data-marca>Prosa</span><i>.</i></a>
+      <p class="origem">Aqui no interior, todo bom atendimento começa com uma prosa.</p>
+      <a class="powered" href="https://whitefox.com.br" target="_blank" rel="noopener">powered by <b>WhiteFox</b></a>
+    </div>
     <nav aria-label="Rodapé"><a href="#demo">Testar</a><a href="#contato">Contato</a><a href="privacidade.html">Privacidade</a></nav>
     <small>Indaiatuba · SP. Os negócios do teste são fictícios. Respostas geradas por IA podem conter erros.</small>
   </div>
@@ -459,7 +467,7 @@ if (CONF.marca) document.querySelectorAll("[data-marca]").forEach((el) => { el.t
 // Com WhatsApp configurado, os links marcados abrem a conversa; sem ele, levam ao formulário
 if (CONF.whatsappContato) {
   const numero = String(CONF.whatsappContato).replace(/\D/g, "");
-  const link = "https://wa.me/" + numero + "?text=" + encodeURIComponent("Oi! Vi o site e quero saber como o assistente funcionaria no meu negócio.");
+  const link = "https://wa.me/" + numero + "?text=" + encodeURIComponent("Oi! Vi o site do Prosa e quero saber como funcionaria no meu negócio.");
   document.querySelectorAll("[data-wa]").forEach((a) => { a.href = link; a.target = "_blank"; a.rel = "noopener"; });
   const f = document.getElementById("waFloat"); f.href = link; f.hidden = false;
   document.getElementById("viaWa").hidden = false;
