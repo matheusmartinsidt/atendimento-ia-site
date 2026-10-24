@@ -6,5 +6,5 @@ window.ATENDIMENTO = {
   // Vazio = o botão "Falar no WhatsApp" não aparece.
   whatsappContato: "",
   // Nome que aparece no topo e no rodapé.
-  marca: "Atendimento IA",
+  marca: "Prosa",
 };
