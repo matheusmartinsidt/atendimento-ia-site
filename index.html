@@ -20,6 +20,7 @@
   /* Só tema claro, mesmo com o sistema no modo escuro */
   :root { color-scheme: light; }
   * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
   html { scroll-behavior: smooth; }
   body { margin: 0; background: var(--papel); color: var(--tinta); font: 17px/1.6 var(--sans); -webkit-font-smoothing: antialiased; }
   a { color: inherit; }
@@ -120,6 +121,7 @@
   .tab[aria-selected="true"] { color: var(--tinta); border-bottom-color: var(--terra); }
   .sugestoes { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
   .sugestoes-tit { font-size: 14px; color: var(--tinta-2); margin-bottom: 6px; }
+  .tabs[hidden] + .sugestoes-tit { margin-top: 30px; }
   .chip { background: none; border: 0; padding: 6px 0; font: 500 17px var(--sans); color: var(--tinta); cursor: pointer; text-align: left; border-bottom: 1px dashed var(--fio); }
   .chip::before { content: "→ "; color: var(--terra); }
   .chip:hover { color: var(--terra); }
@@ -129,9 +131,15 @@
   .treino summary::after { font-size: 22px; }
   .treino-aviso { margin-top: 10px; font-size: 13px; color: var(--terra-2); font-weight: 600; }
   .treino ul { margin: 10px 0 0; padding-left: 18px; color: var(--tinta-2); font-size: 15px; display: grid; gap: 4px; }
-  .chat { background: #e9e1d6; border: 1.5px solid var(--tinta); border-radius: 6px; box-shadow: 10px 10px 0 var(--mata); display: flex; flex-direction: column; height: 560px; overflow: hidden; }
-  .chat-topo { background: #22493a; color: #fff; padding: 13px 16px; display: flex; gap: 12px; align-items: center; }
-  .chat-topo .av { width: 38px; height: 38px; border-radius: 50%; background: var(--mostarda); color: #1d1a16; display: grid; place-items: center; font-weight: 700; font-size: 14px; }
+  /* Demo de um prospect (?c=slug): cor e logo do negócio no lugar do verde */
+  .chat { --demo-cor: #22493a; --demo-texto: #fff; background: #e9e1d6; border: 1.5px solid var(--tinta); border-radius: 6px; box-shadow: 10px 10px 0 var(--mata); display: flex; flex-direction: column; height: 560px; overflow: hidden; }
+  .chat.prospect { box-shadow: 10px 10px 0 var(--demo-cor); }
+  .chat-topo { background: var(--demo-cor); color: var(--demo-texto); padding: 13px 16px; display: flex; gap: 12px; align-items: center; }
+  .chat-topo .av { width: 38px; height: 38px; border-radius: 50%; background: var(--mostarda); color: #1d1a16; display: grid; place-items: center; font-weight: 700; font-size: 14px; flex: none; overflow: hidden; }
+  .chat-topo .av.logo { background: #fff; }
+  .chat-topo .av img { width: 100%; height: 100%; object-fit: contain; }
+  #demo { scroll-margin-top: 40px; }
+  .para-quem { display: block; margin-bottom: 10px; transform: rotate(-1.5deg); transform-origin: left; }
   .chat-topo strong { display: block; font-size: 16px; }
   .chat-topo small { opacity: .8; font-size: 13px; }
   .msgs { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
@@ -141,7 +149,7 @@
   .msg.sys { align-self: center; background: #fbecc8; color: #6a4a10; font-size: 13px; text-align: center; border-radius: 6px; padding: 4px 10px; }
   .chat-form { display: flex; gap: 8px; padding: 10px; background: #f0eae0; border-top: 1px solid #d7cdbd; }
   .chat-form input { flex: 1; min-width: 0; font: 16px var(--sans); padding: 11px 14px; border: 1px solid #cfc4b2; border-radius: 22px; background: #fff; color: #1d1a16; }
-  .chat-form button { border: 0; border-radius: 22px; padding: 0 20px; background: #22493a; color: #fff; font: 600 15px var(--sans); cursor: pointer; }
+  .chat-form button { border: 0; border-radius: 22px; padding: 0 20px; background: var(--demo-cor); color: var(--demo-texto); font: 600 15px var(--sans); cursor: pointer; }
   .chat-form button:disabled { opacity: .5; }
 
   /* Para quem */
@@ -355,19 +363,20 @@
   <section id="demo" class="demo">
     <div class="wrap">
       <div>
+        <span class="mao para-quem" id="paraQuem" hidden></span>
         <h2>Testa aí. <em>É de verdade.</em></h2>
-        <p class="texto" style="margin-top:20px">Escolha um tipo de negócio e escreva como se fosse cliente. Pergunta o preço, tenta marcar um horário ou pede um desconto para ver ele chamar a equipe.</p>
+        <p class="texto" style="margin-top:20px" id="demoTexto">Escolha um tipo de negócio e escreva como se fosse cliente. Pergunta o preço, tenta marcar um horário ou pede um desconto para ver ele chamar a equipe.</p>
         <div class="tabs" role="tablist" aria-label="Tipo de negócio" id="tabs"></div>
         <p class="sugestoes-tit">Ou clique numa pergunta:</p>
         <div class="sugestoes" id="chips"></div>
         <details class="treino">
           <summary>O que este assistente aprendeu</summary>
-          <p class="treino-aviso">Dados fictícios usados no treino desta demonstração. Preços, convênios e endereços não são reais.</p>
+          <p class="treino-aviso" id="treinoAviso">Dados fictícios usados no treino desta demonstração. Preços, convênios e endereços não são reais.</p>
           <ul id="treino"></ul>
         </details>
         <p class="aviso-demo">No seu negócio, o assistente é treinado com as suas informações reais, e você aprova tudo antes de ir ao ar.</p>
       </div>
-      <div class="chat" aria-label="Conversa de teste">
+      <div class="chat" id="chat" aria-label="Conversa de teste">
         <div class="chat-topo"><span class="av" id="chatAvatar">CS</span><div><strong id="chatNome">Clínica</strong><small>assistente virtual</small></div></div>
         <div class="msgs" id="msgs" aria-live="polite"></div>
         <form class="chat-form" id="chatForm">
@@ -548,12 +557,31 @@ function add(texto, tipo) {
   return d;
 }
 
+// Texto escuro sobre cor clara, branco sobre cor escura
+function textoSobre(hex) {
+  const n = parseInt(hex.slice(1), 16);
+  const [r, g, b] = [n >> 16 & 255, n >> 8 & 255, n & 255].map((v) => { v /= 255; return v <= .03928 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4; });
+  return .2126 * r + .7152 * g + .0722 * b > .22 ? "#1d1a16" : "#fff";
+}
+
 function iniciar(chave) {
   nichoAtual = chave;
   const n = NICHOS[chave];
   tabs.querySelectorAll(".tab").forEach((t) => t.setAttribute("aria-selected", String(t.dataset.nicho === chave)));
   $("chatNome").textContent = n.empresa;
-  $("chatAvatar").textContent = n.sigla;
+  const chat = $("chat"), av = $("chatAvatar");
+  chat.classList.toggle("prospect", Boolean(n.cor));
+  if (n.cor) { chat.style.setProperty("--demo-cor", n.cor); chat.style.setProperty("--demo-texto", textoSobre(n.cor)); }
+  else { chat.style.removeProperty("--demo-cor"); chat.style.removeProperty("--demo-texto"); }
+  av.classList.toggle("logo", Boolean(n.logo));
+  if (n.logo) {
+    const img = document.createElement("img");
+    img.src = n.logo; img.alt = ""; img.referrerPolicy = "no-referrer";
+    img.onerror = () => { av.classList.remove("logo"); av.textContent = n.sigla; };
+    av.replaceChildren(img);
+  } else {
+    av.textContent = n.sigla;
+  }
   msgs.innerHTML = "";
   add(n.saudacao, "bot");
   const treino = $("treino");
@@ -585,7 +613,7 @@ async function enviar(texto) {
     method: "POST",
     signal: AbortSignal.timeout(90000),
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ cliente: nichoAtual, session_id: sessaoDe(nichoAtual), message: texto })
+    body: JSON.stringify({ cliente: nichoAtual, session_id: sessaoDe(nichoAtual), message: texto, demo: true })
   });
   try {
     let r;
@@ -612,7 +640,33 @@ Object.entries(NICHOS).forEach(([k, v]) => {
   tabs.appendChild(b);
 });
 $("chatForm").onsubmit = (e) => { e.preventDefault(); const t = input.value; input.value = ""; enviar(t); };
-iniciar("clinica");
+
+// Link de demonstração para um prospect: ?c=salao-exemplo. O servidor só devolve clientes liberados
+// para demo em clientes.json; qualquer outro valor (ou falha) fica na demo padrão.
+async function carregarDemo() {
+  const c = (new URLSearchParams(location.search).get("c") || "").trim().toLowerCase();
+  if (!/^[a-z0-9-]{1,40}$/.test(c)) return iniciar("clinica");
+  if (NICHOS[c]) return iniciar(c);
+  $("chatNome").textContent = "Carregando…";
+  let d = null;
+  try {
+    const r = await fetch(API + "/demo?c=" + encodeURIComponent(c), { signal: AbortSignal.timeout(8000) });
+    if (r.ok) d = await r.json();
+  } catch (e) { /* servidor fora: demo padrão */ }
+  if (!d || !d.empresa || d.slug !== c) return iniciar("clinica");
+  NICHOS[c] = { rotulo: d.rotulo, empresa: d.empresa, sigla: d.sigla || "", saudacao: d.saudacao, sugestoes: d.sugestoes || [], treino: d.treino || [], cor: d.cor, logo: d.logo };
+  tabs.hidden = true;
+  const para = $("paraQuem");
+  para.textContent = "feito para " + d.empresa; para.hidden = false;
+  $("demoTexto").textContent = "Este assistente foi montado com os serviços, preços e horários de vocês. Escreva como se fosse um cliente: pergunte um preço, tente marcar um horário ou peça um desconto para ver ele chamar a equipe.";
+  $("treinoAviso").textContent = d.aviso || "Rascunho feito para esta demonstração. Nada vai ao ar sem a sua aprovação.";
+  iniciar(c);
+  document.title = d.empresa + " | Demonstração do Prosa";
+  // Rola só depois das fontes e da página carregarem: antes disso o texto acima ainda muda de altura
+  const carregou = new Promise((ok) => (document.readyState === "complete" ? ok() : addEventListener("load", ok, { once: true })));
+  Promise.all([carregou, document.fonts ? document.fonts.ready : null]).then(() => $("demo").scrollIntoView({ behavior: "instant" }));
+}
+carregarDemo();
 
 $("leadForm").onsubmit = async (e) => {
   e.preventDefault();
